@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, Menu } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 
@@ -41,18 +41,19 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
 async function createWindow() {
+  Menu.setApplicationMenu(null)
   win = new BrowserWindow({
     width: 1366,
     height: 768,
     // frame: false,
     // transparent: true, // 透明窗口
-    titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: '#fff', // 背景色
-      symbolColor: '#000',
-      height: 30
-    },
-    title: 'Main window',
+    // titleBarStyle: 'hidden',
+    // titleBarOverlay: {
+    //   color: '#fff', // 背景色
+    //   symbolColor: '#000',
+    //   height: 30
+    // },
+    title: '数字人',
     icon: join(process.env.PUBLIC, 'favicon.ico'),
     webPreferences: {
       preload,
@@ -123,5 +124,27 @@ ipcMain.handle('open-win', (_, arg) => {
     childWindow.loadURL(`${url}#${arg}`)
   } else {
     childWindow.loadFile(indexHtml, { hash: arg })
+  }
+})
+
+ipcMain.on('open-win', (_, parame) => {
+  const { width, height, path } = parame
+  const childWindow = new BrowserWindow({
+    // parent: win,
+    title: '视频流',
+    width,
+    height,
+    // frame: false,
+    // titleBarStyle: 'hidden',
+    webPreferences: {
+      preload,
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  })
+  if (process.env.VITE_DEV_SERVER_URL) {
+    childWindow.loadURL(`${url}#${path}`)
+  } else {
+    childWindow.loadFile(indexHtml, { hash: path })
   }
 })

@@ -1,3 +1,10 @@
+// const { contextBridge, ipcRenderer } = require('electron')
+// import { contextBridge, ipcRenderer } from 'electron'
+
+// contextBridge.exposeInMainWorld('electron', {
+//   ipcRenderer,
+// })
+
 function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
   return new Promise((resolve) => {
     if (condition.includes(document.readyState)) {

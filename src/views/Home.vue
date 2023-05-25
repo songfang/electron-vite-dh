@@ -2,28 +2,18 @@
 <div class="homePage">
     首页
     <RouterLink to="/login">登录</RouterLink>
-    <Suspense><Camera /></Suspense>
+    <button @click="openNewWin">打开新窗口</button>
 </div>
 </template>
 
 <script setup>
-async function testIt () {
-  const filters = [
-    { usbVendorId: 0x2341, usbProductId: 0x0043 },
-    { usbVendorId: 0x2341, usbProductId: 0x0001 }
-  ]
-  try {
-    const port = await navigator.serial.requestPort({ filters })
-    const portInfo = port.getInfo()
-    console.log(1111, portInfo)
-    // document.getElementById('device-name').innerHTML = `vendorId: ${portInfo.usbVendorId} | productId: ${portInfo.usbProductId} `
-  } catch (ex) {
-
-  }
-}
+import { ipcRenderer } from 'electron'
 onBeforeMount(()=>{
-    testIt()
+
 })
+function openNewWin(){
+  ipcRenderer.send('open-win', {path: 'live', width: 900, height: 700})
+}
 </script>
 
 <style lang="scss" scoped>
