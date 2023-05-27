@@ -127,13 +127,19 @@ ipcMain.handle('open-win', (_, arg) => {
   }
 })
 
-ipcMain.on('open-win', (_, parame) => {
+// 直播窗口
+let liveWin = null
+ipcMain.on('open-win', (_, parame) => { // 主进程打开新窗口
   const { width, height, path } = parame
-  const childWindow = new BrowserWindow({
+  liveWin = new BrowserWindow({
     // parent: win,
     title: '视频流',
     width,
     height,
+    minimizable: false, // 是否可以最小化
+    maximizable: false, // 是否可以最小化
+    closable: true, // 窗口是否可关闭
+    alwaysOnTop: true, // 窗口是否永远在别的窗口的上面
     // frame: false,
     // titleBarStyle: 'hidden',
     webPreferences: {
@@ -143,8 +149,21 @@ ipcMain.on('open-win', (_, parame) => {
     },
   })
   if (process.env.VITE_DEV_SERVER_URL) {
-    childWindow.loadURL(`${url}#${path}`)
+    liveWin.loadURL(`${url}#${path}`)
   } else {
-    childWindow.loadFile(indexHtml, { hash: path })
+    liveWin.loadFile(indexHtml, { hash: path })
   }
+})
+
+ipcMain.on('play-live', () => {
+  //给live窗体渲染进程发消息
+  if(liveWin) liveWin.webContents.send('play-live')
+})
+
+// ipcMain.on('change-volume', (_, parame) => {
+//   if(liveWin) liveWin.webContents.send('change-volume', parame)
+// })
+
+ipcMain.on('welcome', (_, url) => {
+  if(liveWin) liveWin.webContents.send('welcome', url)
 })
